@@ -1,11 +1,9 @@
-/*
 package me.elmaalem;
 
 import sun.applet.Main;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.BlockingQueue;
@@ -13,15 +11,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CustomInputStream extends InputStream implements ActionListener {
+public class CustomInputStream extends InputStream {
 
-    final JTextField field;
-    final BlockingQueue<String> q;
+    final JTextArea text;
+    final BlockingQueue<String> queue;
 
-    public CustomInputStream(JTextField field) {
-        this.field = field;
-        q = new LinkedBlockingQueue<>();
-        field.addActionListener(this);
+    public CustomInputStream(JTextArea text) {
+        this.text = text;
+        queue = new LinkedBlockingQueue<>();
+
     }
 
     private String s;
@@ -31,7 +29,7 @@ public class CustomInputStream extends InputStream implements ActionListener {
     public int read() throws IOException {
         while (null == s || s.length() <= pos) {
             try {
-                s = q.take();
+                s = queue.take();
                 pos = 0;
             } catch (InterruptedException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -53,7 +51,7 @@ public class CustomInputStream extends InputStream implements ActionListener {
         while (bytes_copied < 1) {
             while (null == s || s.length() <= pos) {
                 try {
-                    s = q.take();
+                    s = queue.take();
                     System.out.println("s = " + s);
                     pos = 0;
                 } catch (InterruptedException ex) {
@@ -67,15 +65,13 @@ public class CustomInputStream extends InputStream implements ActionListener {
         }
         return bytes_copied;
     }
-
     @Override
     public int read(byte[] b) throws IOException {
-        return read(b, 0, b.length); //To change body of generated methods, choose Tools | Templates.
+        return read(b, 0, b.length);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        q.add(field.getText() + "\r\n");
-        field.setText("");
+    public void actionPerformed(KeyEvent e) {
+        queue.add(text.getText() + "\r\n");
+        text.setText("");
     }
 }
-*/

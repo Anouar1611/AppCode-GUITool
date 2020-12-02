@@ -1,6 +1,6 @@
 
 for(k in 1..10) {
-    println("nasro")
+    println("abdennacer")
 }
 //println("You entered:")
 //val stringInput = readLine()!!
