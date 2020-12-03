@@ -1,11 +1,16 @@
 package me.elmaalem;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Tool {
 
@@ -26,14 +31,15 @@ public class Tool {
     private JProgressBar progressBar;
     private JLabel progressLabel;
 
+    private File file;
+
     PrintStream printStream = new PrintStream(new CustomOutputStream(textOutput));
     //TODO : Redirect System.in to console
     CustomInputStream customInputStream = new CustomInputStream(textOutput);
 
-    private File file;
-
     public Tool() {
 
+        // Click of File Button
         fileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -69,6 +75,8 @@ public class Tool {
                 }
             }
         });
+
+        // Click of Run Button
         runButton.addActionListener(new ActionListener() {
 
             public void printLines(String std, InputStream ins) throws Exception {
@@ -87,10 +95,10 @@ public class Tool {
                 Process pro = Runtime.getRuntime().exec(command);
                 printLines("stdout: ", pro.getInputStream());
                 printLines("stderr: ", pro.getErrorStream());
+
                 pro.waitFor();
                 progressBar.setValue(100);
                 System.out.println("Process finished with exit code " + pro.exitValue());
-
             }
 
             public void actionPerformed(ActionEvent e) {
@@ -107,8 +115,31 @@ public class Tool {
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
+
+                String str = textOutput.getText();
+
+                //Extract the File name Error and Line number of Error
+                String regex = "\\(.*?\\.kts:\\d\\)";
+                //Creating a pattern object
+                Pattern pattern = Pattern.compile(regex);
+                ArrayList list = new ArrayList();
+                //Matching the compiled pattern in the String
+                Matcher matcher = pattern.matcher(str);
+                while (matcher.find()) {
+                    list.add(matcher.group());
+                }
+                Iterator it = list.iterator();
+                System.out.println("**********");
+                System.out.println("Name of File and Line Number of Error : ");
+                while (it.hasNext()) {
+                    System.out.println(it.next());
+                }
+
+
             }
         });
+
+        // Click of Save Button
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 FileWriter writer = null;
@@ -121,6 +152,8 @@ public class Tool {
                 }
             }
         });
+
+        // Progress Bar
         progressBar.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("progress" == evt.getPropertyName()) {
@@ -130,8 +163,9 @@ public class Tool {
             }
         });
 
+        // Enter Input from user and click of "Enter" Key
         //TODO : add possibilite for Input
-        textOutput.addKeyListener(new KeyAdapter() {
+        /*textOutput.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
@@ -140,7 +174,7 @@ public class Tool {
                     customInputStream.actionPerformed(e);
                 }
             }
-        });
+        });*/
     }
 
     public static void main(String[] args) {
@@ -151,7 +185,6 @@ public class Tool {
         frame.pack();
         frame.setSize(500, 500);
         frame.setVisible(true);
-
     }
 }
 
